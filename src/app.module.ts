@@ -9,6 +9,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
 import { DeviceModule } from './device/device.module';
 import { HealthModule } from './health/health.module';
+import { InfluxdbModule } from './influxdb/influxdb.module';
+import { GraphModule } from './graph/graph.module';
 
 @Module({
   imports: [
@@ -20,8 +22,10 @@ import { HealthModule } from './health/health.module';
     PrismaModule,
     RedisModule,
     DeviceModule,
-    HealthModule
+    HealthModule,
+    InfluxdbModule,
+    GraphModule
   ],
   providers: [JwtStrategy, DeviceStrategy]
 })
-export class AppModule { }
+export class AppModule {}

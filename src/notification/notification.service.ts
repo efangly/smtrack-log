@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
 import { dateFormat } from '../common/utils';
-import { JwtPayloadDto } from 'src/common/dto';
+import { JwtPayloadDto } from '../common/dto';
 import { Notifications, Prisma } from '@prisma/client';
 
 @Injectable()

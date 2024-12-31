@@ -25,7 +25,6 @@ export class LogdayController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   async findOne(@Param('id') id: string) {
     return this.logdayService.findOne(id);
   }

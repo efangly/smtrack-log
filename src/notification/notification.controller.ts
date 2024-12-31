@@ -6,6 +6,7 @@ import { DeviceJwtAuthGuard, JwtAuthGuard, RolesGuard } from '../common/guards';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { JwtPayloadDto } from '../common/dto';
+import { SkipInterceptor } from '../common/decorators';
 
 @Controller('notification')
 export class NotificationController {
@@ -25,6 +26,7 @@ export class NotificationController {
   }
 
   @Get('dashboard/count')
+  @SkipInterceptor()
   @UseGuards(JwtAuthGuard)
   async findDashboard(@Request() req: { user: JwtPayloadDto }) {
     return this.notificationService.findCount(req.user);

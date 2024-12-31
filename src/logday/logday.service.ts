@@ -4,8 +4,8 @@ import { UpdateLogdayDto } from './dto/update-logday.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
-import { dateFormat } from 'src/common/utils';
-import { JwtPayloadDto } from 'src/common/dto';
+import { dateFormat } from '../common/utils';
+import { JwtPayloadDto } from '../common/dto';
 
 @Injectable()
 export class LogdayService {
