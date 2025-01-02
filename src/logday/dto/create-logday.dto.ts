@@ -7,7 +7,7 @@ export class CreateLogdayDto {
   @MaxLength(100)
   id: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(100)
   serial: string;

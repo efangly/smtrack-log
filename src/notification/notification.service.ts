@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
 import { dateFormat } from '../common/utils';
-import { JwtPayloadDto } from '../common/dto';
+import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
 import { Notifications, Prisma } from '@prisma/client';
 
 @Injectable()
@@ -15,10 +15,11 @@ export class NotificationService {
     private readonly redis: RedisService,
     private readonly rabbitmq: RabbitmqService
   ) {}
-  async create(createNotificationDto: CreateNotificationDto) {
+  async create(createNotificationDto: CreateNotificationDto, user: DevicePayloadDto) {
+    createNotificationDto.serial = user.sn;
     createNotificationDto.createAt = dateFormat(new Date());
     createNotificationDto.updateAt = dateFormat(new Date());
-    await this.rabbitmq.send(process.env.NODE_ENV === "production" ? 'notification' : 'notification-test', JSON.stringify(createNotificationDto));
+    await this.rabbitmq.send(process.env.NODE_ENV === 'production' ? 'notification' : 'notification-test', JSON.stringify(createNotificationDto));
     return createNotificationDto;
   }
 

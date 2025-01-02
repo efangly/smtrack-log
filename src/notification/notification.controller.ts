@@ -3,9 +3,9 @@ import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { DeviceJwtAuthGuard, JwtAuthGuard, RolesGuard } from '../common/guards';
+import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
-import { JwtPayloadDto } from '../common/dto';
 import { SkipInterceptor } from '../common/decorators';
 
 @Controller('notification')
@@ -15,8 +15,8 @@ export class NotificationController {
   @Post()
   @UseGuards(DeviceJwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createNotificationDto: CreateNotificationDto) {
-    return this.notificationService.create(createNotificationDto);
+  async create(@Body() createNotificationDto: CreateNotificationDto, @Request() req: { user: DevicePayloadDto }) {
+    return this.notificationService.create(createNotificationDto, req.user);
   }
 
   @Get()

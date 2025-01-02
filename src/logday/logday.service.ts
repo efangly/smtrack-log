@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
 import { dateFormat } from '../common/utils';
-import { JwtPayloadDto } from '../common/dto';
+import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
 
 @Injectable()
 export class LogdayService {
@@ -14,7 +14,8 @@ export class LogdayService {
     private readonly redis: RedisService,
     private readonly rabbitmq: RabbitmqService
   ) {}
-  async create(createLogdayDto: CreateLogdayDto) {
+  async create(createLogdayDto: CreateLogdayDto, user: DevicePayloadDto) {
+    createLogdayDto.serial = user.sn;
     createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
     createLogdayDto.createAt = dateFormat(new Date());
     createLogdayDto.updateAt = dateFormat(new Date());

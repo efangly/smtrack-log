@@ -5,7 +5,7 @@ import { UpdateLogdayDto } from './dto/update-logday.dto';
 import { DeviceJwtAuthGuard, JwtAuthGuard, RolesGuard } from '../common/guards';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
-import { JwtPayloadDto } from '../common/dto';
+import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
 
 @Controller('logday')
 export class LogdayController {
@@ -14,8 +14,8 @@ export class LogdayController {
   @Post()
   @UseGuards(DeviceJwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createLogdayDto: CreateLogdayDto) {
-    return this.logdayService.create(createLogdayDto);
+  async create(@Body() createLogdayDto: CreateLogdayDto, @Request() req: { user: DevicePayloadDto }) {
+    return this.logdayService.create(createLogdayDto, req.user);
   }
 
   @Get()
