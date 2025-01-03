@@ -40,6 +40,7 @@ model Notifications {
   id       String   @id @default(auto()) @map("_id") @db.ObjectId
   serial   String
   message  String
+  detail   String
   status   Boolean  @default(false)
   device   Devices  @relation(fields: [serial], references: [serial])
   createAt DateTime @default(now())
