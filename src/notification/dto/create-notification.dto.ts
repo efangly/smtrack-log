@@ -15,6 +15,11 @@ export class CreateNotificationDto {
   @IsString()
   @MaxLength(255)
   message: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  detail: string;
   
   @IsOptional()
   @IsBoolean()
