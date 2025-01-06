@@ -20,6 +20,7 @@ export class LogdayService {
     createLogdayDto.createAt = dateFormat(new Date());
     createLogdayDto.updateAt = dateFormat(new Date());
     await this.rabbitmq.send(process.env.NODE_ENV === "production" ? 'logday' : 'logday-test', JSON.stringify(createLogdayDto));
+    await this.rabbitmq.send('send-log', JSON.stringify(createLogdayDto));
     return createLogdayDto;
   }
 

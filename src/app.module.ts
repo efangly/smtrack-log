@@ -11,6 +11,7 @@ import { DeviceModule } from './device/device.module';
 import { HealthModule } from './health/health.module';
 import { InfluxdbModule } from './influxdb/influxdb.module';
 import { GraphModule } from './graph/graph.module';
+import { ConsumerModule } from './consumer/consumer.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { GraphModule } from './graph/graph.module';
     DeviceModule,
     HealthModule,
     InfluxdbModule,
-    GraphModule
+    GraphModule,
+    ConsumerModule
   ],
   providers: [JwtStrategy, DeviceStrategy]
 })
