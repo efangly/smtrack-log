@@ -17,8 +17,6 @@ export class LogdayService {
   async create(createLogdayDto: CreateLogdayDto, user: DevicePayloadDto) {
     createLogdayDto.serial = user.sn;
     createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
-    createLogdayDto.createAt = dateFormat(new Date());
-    createLogdayDto.updateAt = dateFormat(new Date());
     await this.rabbitmq.send(process.env.NODE_ENV === "production" ? 'logday' : 'logday-test', JSON.stringify(createLogdayDto));
     await this.rabbitmq.send('send-log', JSON.stringify(createLogdayDto));
     return createLogdayDto;
