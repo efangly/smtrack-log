@@ -15,10 +15,12 @@ export class InfluxdbService implements OnModuleInit {
       this.queryApi.queryRows(fluxQuery, {
         next: (row, tableMeta) => {
           const data = tableMeta.toObject(row) as InfluxRow; 
+          delete data.result;
+          delete data.table;
           results.push(data);
         },
         error: reject,
-        complete: () => resolve(results),
+        complete: () => resolve(results)
       });
     });
   }

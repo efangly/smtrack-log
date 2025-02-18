@@ -14,7 +14,7 @@ export class LogdayController {
   @Post()
   @UseGuards(DeviceJwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createLogdayDto: CreateLogdayDto, @Request() req: { user: DevicePayloadDto }) {
+  async create(@Body() createLogdayDto: CreateLogdayDto | CreateLogdayDto[] , @Request() req: { user: DevicePayloadDto }) {
     return this.logdayService.create(createLogdayDto, req.user);
   }
 

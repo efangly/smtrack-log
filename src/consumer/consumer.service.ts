@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit, Logger } from '@nestjs/common';
 import { connect } from 'amqplib';
 import { DeviceService } from '../device/device.service';
 import { dateFormat } from '../common/utils';
@@ -9,6 +9,7 @@ import type { Connection, ConsumeMessage } from 'amqplib';
 export class ConsumerService implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly device: DeviceService) {}
   private conn: Connection;
+  private readonly logger = new Logger(ConsumerService.name);
 
   async onModuleInit() {
     const queue = 'add-device';
@@ -26,7 +27,7 @@ export class ConsumerService implements OnModuleInit, OnModuleDestroy {
         channel.ack(payload);
       } catch (err) {
         channel.ack(payload);
-        console.log("Error: ", err);
+        this.logger.error(err);
       }
     });
   }

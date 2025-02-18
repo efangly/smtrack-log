@@ -3,6 +3,8 @@ export interface InfluxRow {
   _value: number;
   _field: string;
   _measurement: string;
+  result: string;
+  table: number;
   sn: string;
   probe: string;
 }

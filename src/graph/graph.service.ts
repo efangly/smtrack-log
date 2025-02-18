@@ -1,12 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InfluxdbService } from '../influxdb/influxdb.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class GraphService {
-  constructor(private readonly influxdb: InfluxdbService) {}
+  constructor(private readonly influxdb: InfluxdbService, private readonly redis: RedisService) {}
   async findAll(sn: string, filter: string) {
     if (!sn) throw new BadRequestException('Invalid sn');
     if (!filter) throw new BadRequestException('Invalid filter');
+    const cache = await this.redis.get(`graph:${sn}${filter.split(',').join("")}`);
+    if (cache) return JSON.parse(cache);
     let query = 'from(bucket: "smtrack-logday") ';
     switch (filter) {
       case 'day':
@@ -23,9 +26,15 @@ export class GraphService {
         const date = filter.split(',');
         query += `|> range(start: ${date[0]}, stop: ${date[1]}) `;
     };
-    query += `|> filter(fn: (r) => r._measurement == "logdays") `;
     // query += '|> timeShift(duration: 7h, columns: ["_time"]) ';
-    query += `|> filter(fn: (r) => r._field == "temp" and r.sn == "${sn}")`;
-    return this.influxdb.queryData(query);
+    query += '|> filter(fn: (r) => r._measurement == "logdays") ';
+    query += `|> filter(fn: (r) => r.sn == "${sn}")`;
+    query += '|> filter(fn: (r) => r._field == "temp" or r._field == "humidity" or r._field == "door1" or r._field == "door2" or r._field == "door3")';
+    query += '|> filter(fn: (r) => r.probe == "1" or r.probe == "2")';
+    query += '|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")';
+    query += '|> keep(columns: ["_time", "temp", "humidity", "door1", "door2", "door3", "probe"])';
+    const result = await this.influxdb.queryData(query);
+    await this.redis.set(`graph:${sn}${filter.split(',').join("")}`, JSON.stringify(result), 10);
+    return result;
   }
 }

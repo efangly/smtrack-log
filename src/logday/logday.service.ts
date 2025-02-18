@@ -10,16 +10,26 @@ import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
 @Injectable()
 export class LogdayService {
   constructor(
-    private readonly prisma: PrismaService, 
+    private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly rabbitmq: RabbitmqService
   ) {}
-  async create(createLogdayDto: CreateLogdayDto, user: DevicePayloadDto) {
-    createLogdayDto.serial = user.sn;
-    createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
-    await this.rabbitmq.send(process.env.NODE_ENV === "production" ? 'logday' : 'logday-test', JSON.stringify(createLogdayDto));
-    await this.rabbitmq.send('send-log', JSON.stringify(createLogdayDto));
-    return createLogdayDto;
+  async create(createLogdayDto: CreateLogdayDto | CreateLogdayDto[], user: DevicePayloadDto) {
+    if (Array.isArray(createLogdayDto)) {
+      for (const log of createLogdayDto) {
+        log.serial = user.sn;
+        log.sendTime = dateFormat(log.sendTime);
+        await this.rabbitmq.send(process.env.NODE_ENV === "production" ? 'logday' : 'logday-test', JSON.stringify(log));
+        await this.rabbitmq.send('send-log', JSON.stringify(log));
+      }
+      return createLogdayDto.length;
+    } else {
+      createLogdayDto.serial = user.sn;
+      createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
+      await this.rabbitmq.send(process.env.NODE_ENV === "production" ? 'logday' : 'logday-test', JSON.stringify(createLogdayDto));
+      await this.rabbitmq.send('send-log', JSON.stringify(createLogdayDto));
+      return createLogdayDto;
+    }
   }
 
   async findAll(user: JwtPayloadDto) {
@@ -30,7 +40,7 @@ export class LogdayService {
     const cache = await this.redis.get(`log:${id}`);
     if (cache) return JSON.parse(cache);
     const log = await this.prisma.logDays.findMany({ where: { serial: id } });
-    await this.redis.set(`log:${id}`, JSON.stringify(log), 15);
+    await this.redis.set(`log:${id}`, JSON.stringify(log), 10);
     return log;
   }
 

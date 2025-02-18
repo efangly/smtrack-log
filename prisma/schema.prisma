@@ -10,12 +10,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model LogDays {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  id              String   @id @default(uuid())
   serial          String
   temp            Float    @default(0.00)
   tempDisplay     Float    @default(0.00)
@@ -37,7 +37,7 @@ model LogDays {
 }
 
 model Notifications {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  id       String   @id @default(uuid())
   serial   String
   message  String
   detail   String
@@ -48,7 +48,7 @@ model Notifications {
 }
 
 model Devices {
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  id           String          @id @default(uuid())
   serial       String          @unique
   ward         String
   hospital     String
@@ -58,6 +58,7 @@ model Devices {
   seq          Int
   firmware     String
   remark       String?
+  online       Boolean         @default(false)
   log          LogDays[]
   notification Notifications[]
   createAt     DateTime
