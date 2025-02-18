@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log
+  namespace: smtrack
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: log
+  template:
+    metadata:
+      labels:
+        app: log
+    spec:
+      containers:
+      - name: log
+        image: siamatic/smtrack-log-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+          limits:
+            memory: 256Mi
+            cpu: 100m
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: log-config
+              key: DATABASE_URL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: log-config
+              key: PORT
+        - name: JWT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: jwt-secret
+              key: JWT_SECRET
+        - name: DEVICE_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: jwt-secret
+              key: DEVICE_SECRET
+        - name: RADIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: redis-config
+              key: RADIS_HOST
+        - name: RADIS_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: redis-config
+              key: RADIS_PASSWORD
+        - name: RABBITMQ
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: RABBITMQ
+        - name: INFLUXDB_URI
+          valueFrom:
+            configMapKeyRef:
+              name: influxdb-config
+              key: INFLUXDB_URI
+        - name: INFLUXDB_ORG
+          valueFrom:
+            configMapKeyRef:
+              name: influxdb-config
+              key: INFLUXDB_ORG
+        - name: INFLUXDB_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: influxdb-config
+              key: INFLUXDB_BUCKET
+        - name: INFLUXDB_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: influxdb-config
+              key: INFLUXDB_TOKEN
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: log-config
+              key: NODE_ENV
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log
+  namespace: smtrack
+spec:
+  selector:
+    app: log
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP
