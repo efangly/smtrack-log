@@ -30,6 +30,15 @@ export class NotificationService {
     if (cache) return JSON.parse(cache);
     const notification = await this.prisma.notifications.findMany({ 
       where: conditions,
+      include: { 
+        device: {
+          select: {
+            name: true,
+            ward: true,
+            hospital: true
+          }
+        } 
+      },
       orderBy: { createAt: 'desc' }
     });
     if (notification.length === 0) return notification;
