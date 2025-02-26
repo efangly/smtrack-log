@@ -19,15 +19,15 @@ export class LogdayService {
       for (const log of createLogdayDto) {
         log.serial = user.sn;
         log.sendTime = dateFormat(log.sendTime);
-        await this.rabbitmq.send(process.env.NODE_ENV === "production" ? 'logday' : 'logday-test', JSON.stringify(log));
-        await this.rabbitmq.send('send-log', JSON.stringify(log));
+        this.rabbitmq.send<CreateLogdayDto>('logday', log);
+        this.rabbitmq.send<CreateLogdayDto>('log-device', log);
       }
       return createLogdayDto.length;
     } else {
       createLogdayDto.serial = user.sn;
       createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
-      await this.rabbitmq.send(process.env.NODE_ENV === "production" ? 'logday' : 'logday-test', JSON.stringify(createLogdayDto));
-      await this.rabbitmq.send('send-log', JSON.stringify(createLogdayDto));
+      this.rabbitmq.send<CreateLogdayDto>('logday', createLogdayDto);
+      this.rabbitmq.send<CreateLogdayDto>('log-device', createLogdayDto);
       return createLogdayDto;
     }
   }

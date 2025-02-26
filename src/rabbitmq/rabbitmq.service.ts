@@ -1,22 +1,11 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { connect } from "amqplib";
-import type { Connection, Channel } from "amqplib";
+import { Injectable, Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
-export class RabbitmqService implements OnModuleInit, OnModuleDestroy {
-  private channel: Channel;
-  async onModuleInit() {
-    const conn: Connection = await connect(String(process.env.RABBITMQ));
-    this.channel = await conn.createChannel();
-    await this.channel.assertExchange(process.env.NODE_ENV === "production" ? "smtrack" : "smtrack-test", 'direct', { durable: true });
-  }
+export class RabbitmqService {
+  constructor(@Inject('RABBITMQ_SERVICE') private readonly client: ClientProxy) {}
 
-  async send(queue: string, payload: string): Promise<void> {
-    await this.channel.assertQueue(queue, { durable: true });
-    this.channel.sendToQueue(queue, Buffer.from(payload), { persistent: true });
-  }
-
-  async onModuleDestroy() {
-    this.channel.close();
+  send<T>(queue: string, payload: T) {
+    this.client.emit(queue, payload);
   }
 }

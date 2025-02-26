@@ -20,7 +20,7 @@ export class NotificationService {
     createNotificationDto.detail = this.setDetailMessage(createNotificationDto.message);
     createNotificationDto.createAt = dateFormat(new Date());
     createNotificationDto.updateAt = dateFormat(new Date());
-    await this.rabbitmq.send(process.env.NODE_ENV === 'production' ? 'notification' : 'notification-test', JSON.stringify(createNotificationDto));
+    this.rabbitmq.send<CreateNotificationDto>('notification', createNotificationDto);
     return createNotificationDto;
   }
 

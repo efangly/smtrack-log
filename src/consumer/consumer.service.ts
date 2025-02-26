@@ -1,38 +1,20 @@
-import { Injectable, OnModuleDestroy, OnModuleInit, Logger } from '@nestjs/common';
-import { connect } from 'amqplib';
-import { DeviceService } from '../device/device.service';
+import { Injectable } from '@nestjs/common';
 import { dateFormat } from '../common/utils';
-import { CreateDeviceDto } from 'src/device/dto/create-device.dto';
-import type { Connection, ConsumeMessage } from 'amqplib';
+import { DeviceService } from '../device/device.service';
+import { CreateDeviceDto } from '../device/dto/create-device.dto';
+import { UpdateDeviceDto } from '../device/dto/update-device.dto';
 
 @Injectable()
-export class ConsumerService implements OnModuleInit, OnModuleDestroy {
+export class ConsumerService {
   constructor(private readonly device: DeviceService) {}
-  private conn: Connection;
-  private readonly logger = new Logger(ConsumerService.name);
-
-  async onModuleInit() {
-    const queue = 'add-device';
-    this.conn = await connect(String(process.env.RABBITMQ));
-    const channel = await this.conn.createChannel();
-    await channel.assertExchange(process.env.NODE_ENV === "production" ? "smtrack" : "smtrack-test", 'direct', { durable: true });
-    await channel.assertQueue(queue, { durable: true });
-    await channel.prefetch(1);
-    channel.consume(queue, async (payload: ConsumeMessage | null) => {
-      try {
-        const device = JSON.parse(payload.content.toString()) as CreateDeviceDto;
-        device.createAt = dateFormat(new Date());
-        device.updateAt = dateFormat(new Date());
-        await this.device.create(device);
-        channel.ack(payload);
-      } catch (err) {
-        channel.ack(payload);
-        this.logger.error(err);
-      }
-    });
+  async createDevice(device: CreateDeviceDto) {
+    device.createAt = dateFormat(new Date());
+    device.updateAt = dateFormat(new Date());
+    await this.device.create(device);
   }
 
-  async onModuleDestroy() {
-    this.conn.close();
+  async updateDevice(device: UpdateDeviceDto) {
+    device.updateAt = dateFormat(new Date());
+    await this.device.update(device.id, device);
   }
 }
