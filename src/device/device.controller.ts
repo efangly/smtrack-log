@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Post, Body, Param, Put } from '@nestjs/common';
 import { DeviceService } from './device.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
+import { OnlineDto } from '../logday/dto/online.dto';
 
 @Controller('device')
 export class DeviceController {
   constructor(private readonly deviceService: DeviceService) {}
 
   @Post()
-  create(@Body() createDeviceDto: CreateDeviceDto) {
+  async create(@Body() createDeviceDto: CreateDeviceDto) {
     return this.deviceService.create(createDeviceDto);
   }
 
-  @Get()
-  findAll() {
-    return this.deviceService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.deviceService.findOne(id);
+  @Post('online')
+  async online(@Body() data: OnlineDto) {
+    return this.deviceService.onlineStatus(data);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateDeviceDto: UpdateDeviceDto) {
+  async update(@Param('id') id: string, @Body() updateDeviceDto: UpdateDeviceDto) {
     return this.deviceService.update(id, updateDeviceDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.deviceService.remove(id);
   }
 }

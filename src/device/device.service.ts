@@ -3,10 +3,12 @@ import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { dateFormat } from '../common/utils';
+import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
+import { OnlineDto } from '../logday/dto/online.dto';
 
 @Injectable()
 export class DeviceService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService, private readonly rabbitmq: RabbitmqService) { }
   async create(createDeviceDto: CreateDeviceDto) {
     return this.prisma.devices.create({
       data: {
@@ -25,12 +27,11 @@ export class DeviceService {
     });
   }
 
-  async findAll() {
-    return this.prisma.devices.findMany();
-  }
-
-  async findOne(id: string) {
-    return `This action returns a #${id} device`;
+  async onlineStatus(data: OnlineDto) {
+    if (data.clientid.substring(0, 4) === "eTPV" || data.clientid.substring(0, 4) === "iTSV") {
+      this.rabbitmq.send('online', { sn: data.clientid, status: data.event === "client.connected" ? true : false });
+    }
+    return data;
   }
 
   async update(id: string, updateDeviceDto: UpdateDeviceDto) {
@@ -38,9 +39,5 @@ export class DeviceService {
       where: { serial: id },
       data: updateDeviceDto
     });
-  }
-
-  async remove(id: string) {
-    return this.prisma.devices.delete({ where: { serial: id } });
   }
 }
