@@ -1,8 +1,7 @@
-import { Module, Global } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { RabbitmqService } from './rabbitmq.service';
 
-@Global()
 @Module({
   imports: [ 
     ClientsModule.register([
