@@ -19,15 +19,15 @@ export class LogdayService {
       for (const log of createLogdayDto) {
         log.serial = user.sn;
         log.sendTime = dateFormat(log.sendTime);
-        this.rabbitmq.send<CreateLogdayDto>('logday', log);
-        this.rabbitmq.send<CreateLogdayDto>('log-device', log);
+        this.rabbitmq.sendToLog<CreateLogdayDto>('logday', log);
+        this.rabbitmq.sendToDevice<CreateLogdayDto>('log-device', log);
       }
       return createLogdayDto.length;
     } else {
       createLogdayDto.serial = user.sn;
       createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
-      this.rabbitmq.send<CreateLogdayDto>('logday', createLogdayDto);
-      this.rabbitmq.send<CreateLogdayDto>('log-device', createLogdayDto);
+      this.rabbitmq.sendToLog<CreateLogdayDto>('logday', createLogdayDto);
+      this.rabbitmq.sendToDevice<CreateLogdayDto>('log-device', createLogdayDto);
       return createLogdayDto;
     }
   }

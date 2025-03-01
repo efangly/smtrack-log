@@ -13,6 +13,24 @@ import { RabbitmqService } from './rabbitmq.service';
           queue: 'log_queue',
           queueOptions: { durable: true }
         }
+      },
+      {
+        name: 'RABBITMQ_SERVICE_DEVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ],
+          queue: 'log_device_queue',
+          queueOptions: { durable: true }
+        }
+      },
+      {
+        name: 'RABBITMQ_SERVICE_NOTIFICATION',
+        transport: Transport.RMQ,
+        options: {
+          urls: [process.env.RABBITMQ],
+          queue: 'notification_queue',
+          queueOptions: { durable: true }
+        }
       }
     ])
   ],

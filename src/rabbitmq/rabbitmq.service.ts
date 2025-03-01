@@ -3,9 +3,21 @@ import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class RabbitmqService {
-  constructor(@Inject('RABBITMQ_SERVICE') private readonly client: ClientProxy) {}
+  constructor(
+    @Inject('RABBITMQ_SERVICE') private readonly log: ClientProxy,
+    @Inject('RABBITMQ_SERVICE_DEVICE') private readonly device: ClientProxy,
+    @Inject('RABBITMQ_SERVICE_NOTIFICATION') private readonly notification: ClientProxy
+  ) {}
 
-  send<T>(queue: string, payload: T) {
-    this.client.emit(queue, payload);
+  sendToLog<T>(queue: string, payload: T) {
+    this.log.emit(queue, payload);
+  }
+
+  sendToDevice<T>(queue: string, payload: T) {
+    this.device.emit(queue, payload);
+  }
+
+  sendToNotification<T>(queue: string, payload: T) {
+    this.notification.emit(queue, payload);
   }
 }

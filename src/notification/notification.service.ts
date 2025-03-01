@@ -20,7 +20,7 @@ export class NotificationService {
     createNotificationDto.detail = this.setDetailMessage(createNotificationDto.message);
     createNotificationDto.createAt = dateFormat(new Date());
     createNotificationDto.updateAt = dateFormat(new Date());
-    this.rabbitmq.send<CreateNotificationDto>('notification', createNotificationDto);
+    this.rabbitmq.sendToNotification<CreateNotificationDto>('notification', createNotificationDto);
     return createNotificationDto;
   }
 
