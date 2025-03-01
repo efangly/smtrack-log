@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -9,6 +9,8 @@ import { OnlineDto } from '../logday/dto/online.dto';
 @Injectable()
 export class DeviceService {
   constructor(private readonly prisma: PrismaService, private readonly rabbitmq: RabbitmqService) { }
+  private readonly logger = new Logger(DeviceService.name);
+
   async create(createDeviceDto: CreateDeviceDto) {
     return this.prisma.devices.create({
       data: {
@@ -29,6 +31,7 @@ export class DeviceService {
 
   async onlineStatus(data: OnlineDto) {
     if (data.clientid.substring(0, 4) === "eTPV" || data.clientid.substring(0, 4) === "iTSV") {
+      this.logger.log(`${data.clientid} is ${data.event === "client.connected" ? "online" : "offline"}`);
       this.rabbitmq.send('online', { sn: data.clientid, status: data.event === "client.connected" ? true : false });
     }
     return data;
