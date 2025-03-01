@@ -15,6 +15,6 @@ export class ConsumerService {
 
   async updateDevice(device: UpdateDeviceDto) {
     device.updateAt = dateFormat(new Date());
-    await this.device.update(device.id, device);
+    await this.device.update(device.serial, device);
   }
 }

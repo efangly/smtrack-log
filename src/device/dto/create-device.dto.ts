@@ -4,7 +4,7 @@ export class CreateDeviceDto {
   @IsOptional()
   @IsString()
   @MaxLength(40)
-  id: string;
+  serial: string;
 
   @IsOptional()
   @IsString()

@@ -9,12 +9,11 @@ import { OnlineDto } from '../logday/dto/online.dto';
 @Injectable()
 export class DeviceService {
   constructor(private readonly prisma: PrismaService, private readonly rabbitmq: RabbitmqService) { }
-  private readonly logger = new Logger(DeviceService.name);
 
   async create(createDeviceDto: CreateDeviceDto) {
     return this.prisma.devices.create({
       data: {
-        serial: createDeviceDto.id,
+        serial: createDeviceDto.serial,
         ward: createDeviceDto.ward,
         hospital: createDeviceDto.hospital,
         staticName: createDeviceDto.staticName,
