@@ -13,7 +13,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ResponseInterceptor(reflector));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.setGlobalPrefix('log');
-  const microservice = await NestFactory.createMicroservice<MicroserviceOptions>(ConsumerModule, {
+  const microservice = app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
       urls: [process.env.RABBITMQ],
@@ -21,7 +21,7 @@ async function bootstrap() {
       queueOptions: { durable: true },
       noAck: false,
       prefetchCount: 1
-    },
+    }
   });
   await microservice.listen();
   await app.listen(process.env.PORT ?? 8080);

@@ -28,6 +28,7 @@ export class LogdayService {
       createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
       this.rabbitmq.sendToLog<CreateLogdayDto>('logday', createLogdayDto);
       this.rabbitmq.sendToDevice<CreateLogdayDto>('log-device', createLogdayDto);
+      this.rabbitmq.sendToBackup<CreateLogdayDto>('logday-backup', createLogdayDto);
       return createLogdayDto;
     }
   }
