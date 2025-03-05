@@ -27,5 +27,5 @@ export class CronService {
     } catch (error) {
       this.logger.error(`log delete failed with error: ${error.message}`); 
     }
-  }s
+  }
 }
