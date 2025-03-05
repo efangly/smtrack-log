@@ -31,15 +31,6 @@ import { RabbitmqService } from './rabbitmq.service';
           queue: 'notification_queue',
           queueOptions: { durable: true }
         }
-      },
-      {
-        name: 'RABBITMQ_SERVICE_BACKUP',
-        transport: Transport.RMQ,
-        options: {
-          urls: [process.env.RABBITMQ],
-          queue: 'backup_queue',
-          queueOptions: { durable: true }
-        }
       }
     ])
   ],

@@ -21,7 +21,6 @@ export class NotificationService {
     createNotificationDto.createAt = dateFormat(new Date());
     createNotificationDto.updateAt = dateFormat(new Date());
     this.rabbitmq.sendToNotification<CreateNotificationDto>('notification', createNotificationDto);
-    this.rabbitmq.sendToBackup<CreateNotificationDto>('notification-backup', createNotificationDto);
     return createNotificationDto;
   }
 
