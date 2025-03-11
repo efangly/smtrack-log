@@ -7,13 +7,15 @@ import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
 import { dateFormat } from '../common/utils';
 import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
 import { Notifications, Prisma } from '@prisma/client';
+import { InfluxdbService } from '../influxdb/influxdb.service';
 
 @Injectable()
 export class NotificationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
-    private readonly rabbitmq: RabbitmqService
+    private readonly rabbitmq: RabbitmqService,
+    private readonly influxdb: InfluxdbService
   ) {}
   async create(createNotificationDto: CreateNotificationDto, user: DevicePayloadDto) {
     createNotificationDto.serial = user.sn;
@@ -44,6 +46,31 @@ export class NotificationService {
     if (notification.length === 0) return notification;
     await this.redis.set(key, JSON.stringify(notification), 10);
     return notification;
+  }
+
+  async findNotification(user: JwtPayloadDto, filter: string) {
+    let query = 'from(bucket: "smtrack-logday-prod") ';
+    if (filter) {
+      query += `|> range(start: ${filter}T00:00:00Z, stop: ${filter}T23:59:59Z) `;
+    } else {
+      query += '|> range(start: -1d) ';
+    }
+    query += '|> filter(fn: (r) => r._measurement == "notification") ';
+    switch (user.role) {
+      case 'SERVICE':
+        query += `|> filter(fn: (r) => r.hospital != "HID-DEVELOPMENT" and r.ward != "WID-DEVELOPMENT") `;
+        break;
+      case 'ADMIN':
+        query += `|> filter(fn: (r) => r.hospital == "${user.hosId}") `;
+        break;
+      case "USER":
+        query += `|> filter(fn: (r) => r.ward == "${user.wardId}") `;
+        break; 
+    }
+    query += '|> filter(fn: (r) => r._field == "message") ';
+    query += '|> keep(columns: ["_time", "message"])';
+    const history = await this.influxdb.queryData(query);
+    return history;
   }
 
   async findCount(user: JwtPayloadDto) {
@@ -92,11 +119,11 @@ export class NotificationService {
     let conditions: Prisma.NotificationsWhereInput | undefined = undefined;
     let key = "";
     switch (user.role) {
-      case "LEGACY_USER":
+      case "USER":
         conditions = { device: { ward: user.wardId } };
         key = `notification:${user.wardId}`;
         break;
-      case "LEGACY_ADMIN":
+      case "ADMIN":
         conditions = { device: { hospital: user.hosId } };
         key = `notification:${user.hosId}`;
         break;

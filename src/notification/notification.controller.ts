@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, HttpStatus, HttpCode, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, HttpStatus, HttpCode, Request, UseGuards, Query } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
@@ -22,6 +22,13 @@ export class NotificationController {
   @UseGuards(JwtAuthGuard)
   async findAll(@Request() req: { user: JwtPayloadDto }) {
     return this.notificationService.findAll(req.user);
+  }
+
+  @Get('history/filter')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER, Role.SERVICE, Role.ADMIN, Role.USER)
+  async findHistory(@Request() req: { user: JwtPayloadDto }, @Query('filter') filter: string) {
+    return this.notificationService.findNotification(req.user, filter);
   }
 
   @Get('dashboard/count')
