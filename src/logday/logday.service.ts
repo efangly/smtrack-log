@@ -47,7 +47,7 @@ export class LogdayService {
     const cache = await this.redis.get(`log:${id}`);
     if (cache) return JSON.parse(cache);
     const log = await this.prisma.logDays.findMany({ where: { serial: id } });
-    await this.redis.set(`log:${id}`, JSON.stringify(log), 15);
+    if (log.length > 0) await this.redis.set(`log:${id}`, JSON.stringify(log), 15);
     return log;
   }
 
