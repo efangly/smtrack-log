@@ -28,7 +28,9 @@ export class LogdayService {
       }
       return createLogdayDto.length;
     } else {
-      if (format(createLogdayDto.sendTime, "yyyy") !== currentYear) throw new BadRequestException('Invalid year');
+      if (format(createLogdayDto.sendTime, "yyyy") !== currentYear) {
+        throw new BadRequestException(`Invalid year expect ${currentYear} but got ${format(createLogdayDto.sendTime, "yyyy")}, ${createLogdayDto.serial}`);
+      }
       createLogdayDto.serial = user.sn;
       createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
       this.rabbitmq.sendToLog<CreateLogdayDto>('logday', createLogdayDto);
