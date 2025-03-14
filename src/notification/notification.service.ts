@@ -59,7 +59,7 @@ export class NotificationService {
     query += '|> timeShift(duration: 7h, columns: ["_time"]) ';
     switch (user.role) {
       case 'SERVICE':
-        query += `|> filter(fn: (r) => r.hospital != "HID-DEVELOPMENT" and r.ward != "WID-DEVELOPMENT") `;
+        query += '|> filter(fn: (r) => r.hospital != "HID-DEVELOPMENT" and r.ward != "WID-DEVELOPMENT") ';
         break;
       case 'ADMIN':
         query += `|> filter(fn: (r) => r.hospital == "${user.hosId}") `;
@@ -70,7 +70,6 @@ export class NotificationService {
     }
     query += '|> filter(fn: (r) => r._field == "message") ';
     query += '|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")';
-    query += '|> keep(columns: ["_time", "message"])';
     const history = await this.influxdb.queryData(query);
     return history;
   }
