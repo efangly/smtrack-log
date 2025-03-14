@@ -10,7 +10,7 @@ export class GraphService {
     if (!filter) throw new BadRequestException('Invalid filter');
     const cache = await this.redis.get(`graph:${sn}${filter.split(',').join("")}`);
     if (cache) return JSON.parse(cache);
-    let query = 'from(bucket: "smtrack-logday") ';
+    let query = `from(bucket: "${process.env.INFLUXDB_BUCKET}") `;
     switch (filter) {
       case 'day':
         query += '|> range(start: -1d) ';
@@ -26,7 +26,7 @@ export class GraphService {
         const date = filter.split(',');
         query += `|> range(start: ${date[0]}, stop: ${date[1]}) `;
     };
-    // query += '|> timeShift(duration: 7h, columns: ["_time"]) ';
+    query += '|> timeShift(duration: 7h, columns: ["_time"]) ';
     query += '|> filter(fn: (r) => r._measurement == "logdays") ';
     query += `|> filter(fn: (r) => r.sn == "${sn}")`;
     query += '|> filter(fn: (r) => r._field == "temp" or r._field == "humidity" or r._field == "door1" or r._field == "door2" or r._field == "door3")';

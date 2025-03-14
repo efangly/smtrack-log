@@ -49,13 +49,14 @@ export class NotificationService {
   }
 
   async findNotification(user: JwtPayloadDto, filter: string) {
-    let query = 'from(bucket: "smtrack-logday-prod") ';
+    let query = `from(bucket: "${process.env.INFLUXDB_BUCKET}") `;
     if (filter) {
       query += `|> range(start: ${filter}T00:00:00Z, stop: ${filter}T23:59:59Z) `;
     } else {
       query += '|> range(start: -1d) ';
     }
     query += '|> filter(fn: (r) => r._measurement == "notification") ';
+    query += '|> timeShift(duration: 7h, columns: ["_time"]) ';
     switch (user.role) {
       case 'SERVICE':
         query += `|> filter(fn: (r) => r.hospital != "HID-DEVELOPMENT" and r.ward != "WID-DEVELOPMENT") `;
@@ -68,6 +69,7 @@ export class NotificationService {
         break; 
     }
     query += '|> filter(fn: (r) => r._field == "message") ';
+    query += '|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")';
     query += '|> keep(columns: ["_time", "message"])';
     const history = await this.influxdb.queryData(query);
     return history;

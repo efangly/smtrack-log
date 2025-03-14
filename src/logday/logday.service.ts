@@ -4,7 +4,6 @@ import { UpdateLogdayDto } from './dto/update-logday.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
-import { dateFormat } from '../common/utils';
 import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
 import { format } from 'date-fns';
 
@@ -21,7 +20,7 @@ export class LogdayService {
       for (const log of createLogdayDto) {
         if (format(log.sendTime, "yyyy") === currentYear) {
           log.serial = user.sn;
-          log.sendTime = dateFormat(log.sendTime);
+          log.sendTime = log.sendTime;
           this.rabbitmq.sendToLog<CreateLogdayDto>('logday', log);
           this.rabbitmq.sendToDevice<CreateLogdayDto>('log-device', log);
         }
@@ -32,7 +31,7 @@ export class LogdayService {
         throw new BadRequestException(`Invalid year expect ${currentYear} but got ${format(createLogdayDto.sendTime, "yyyy")}, ${createLogdayDto.serial}`);
       }
       createLogdayDto.serial = user.sn;
-      createLogdayDto.sendTime = dateFormat(createLogdayDto.sendTime);
+      createLogdayDto.sendTime = createLogdayDto.sendTime;
       this.rabbitmq.sendToLog<CreateLogdayDto>('logday', createLogdayDto);
       this.rabbitmq.sendToDevice<CreateLogdayDto>('log-device', createLogdayDto);
       return createLogdayDto;
