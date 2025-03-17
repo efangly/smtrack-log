@@ -20,8 +20,6 @@ export class NotificationService {
   async create(createNotificationDto: CreateNotificationDto, user: DevicePayloadDto) {
     createNotificationDto.serial = user.sn;
     createNotificationDto.detail = this.setDetailMessage(createNotificationDto.message);
-    createNotificationDto.createAt = dateFormat(new Date());
-    createNotificationDto.updateAt = dateFormat(new Date());
     this.rabbitmq.sendToNotification<CreateNotificationDto>('notification', createNotificationDto);
     return createNotificationDto;
   }
