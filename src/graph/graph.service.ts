@@ -34,7 +34,7 @@ export class GraphService {
     query += '|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")';
     query += '|> keep(columns: ["_time", "temp", "humidity", "door1", "door2", "door3", "probe"])';
     const result = await this.influxdb.queryData(query);
-    if (result.length > 0) await this.redis.set(`graph:${sn}${filter.split(',').join("")}`, JSON.stringify(result), 15);
+    if (result.length > 0) await this.redis.set(`graph:${sn}${filter.split(',').join("")}`, JSON.stringify(result), 1800);
     return result;
   }
 }
