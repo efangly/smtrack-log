@@ -62,7 +62,7 @@ export class DeviceService {
     if (user) `|> filter(fn: (r) => r.user == "${user}") `;
     query += '|> filter(fn: (r) => r._field == "message") ';
     query += '|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") ';
-    query += '|> keep(columns: ["_time", "message"])';
+    query += '|> keep(columns: ["_time", "service", "type", "user", "message"])';
     return this.influxdb.queryData(query);
   }
 }
