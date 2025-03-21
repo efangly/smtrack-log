@@ -24,13 +24,13 @@ jobs:
       with:
         payload: |
           {
-            "text": "GitHub Action build siamatic/smtrack-log-service result: ${{ job.status }}",
+            "text": "GitHub Action build siamatic/smtrack-log-service result: ${{ job.status }} 🖕",
             "blocks": [
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "GitHub Action build siamatic/smtrack-log-service result: ${{ job.status }}"
+                  "text": "GitHub Action build siamatic/smtrack-log-service result: ${{ job.status }} 🖕"
                 }
               }
             ]
