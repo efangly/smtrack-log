@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, HttpStatus, HttpCode, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards, HttpStatus, HttpCode, Request, Query } from '@nestjs/common';
 import { LogdayService } from './logday.service';
 import { CreateLogdayDto } from './dto/create-logday.dto';
 import { UpdateLogdayDto } from './dto/update-logday.dto';
@@ -20,8 +20,13 @@ export class LogdayController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async findAll(@Request() req: { user: JwtPayloadDto }) {
-    return this.logdayService.findAll(req.user);
+  async findAll(
+    @Query('filter') filter: string,
+    @Query('ward') ward: string,
+    @Query('page') page: string,
+    @Query('perpage') perpage: string
+  ) {
+    return this.logdayService.findAll(filter, page, perpage, ward);
   }
 
   @Get(':id')

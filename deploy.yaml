@@ -4,7 +4,7 @@ metadata:
   name: log
   namespace: smtrack
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: log
@@ -15,8 +15,7 @@ spec:
     spec:
       containers:
       - name: log
-        image: siamatic/smtrack-log-service:latest
-        imagePullPolicy: Always
+        image: siamatic/smtrack-log-service:1.0.0
         ports:
         - containerPort: 8080
         readinessProbe:

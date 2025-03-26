@@ -20,8 +20,13 @@ export class NotificationController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async findAll(@Request() req: { user: JwtPayloadDto }) {
-    return this.notificationService.findAll(req.user);
+  async findAll(
+    @Query('filter') filter: string,
+    @Query('page') page: string,
+    @Query('perpage') perpage: string,
+    @Request() req: { user: JwtPayloadDto }
+  ) {
+    return this.notificationService.findAll(filter, page, perpage, req.user);
   }
 
   @Get('history/filter')

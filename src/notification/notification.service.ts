@@ -4,7 +4,6 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
-import { dateFormat } from '../common/utils';
 import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
 import { Notifications, Prisma } from '@prisma/client';
 import { InfluxdbService } from '../influxdb/influxdb.service';
@@ -24,10 +23,38 @@ export class NotificationService {
     return createNotificationDto;
   }
 
-  async findAll(user: JwtPayloadDto): Promise<Notifications[]> {
-    const { conditions, key } = this.findCondition(user);
-    const cache = await this.redis.get(key);
-    if (cache) return JSON.parse(cache);
+  async findAll(filter: string, current: string, total: string, user: JwtPayloadDto): Promise<Notifications[]> {
+    const page = parseInt(current) || 1;
+    const perpage = parseInt(total) || 10;
+    let { conditions, key } = this.findCondition(user);
+    key = `${key}${page}${perpage}`;
+    if (filter) {
+      switch (filter) {
+        case "door":
+          conditions = { ...conditions, ...{ message: { contains: "DOOR" } } };
+          break;
+        case "temp":
+          conditions = { ...conditions, ...{ message: { contains: "TEMP" } } };
+          break;
+        case "internet":
+          conditions = { ...conditions, ...{ message: { contains: "INTERNET" } } };
+          break;
+        case "plug":
+          conditions = { ...conditions, ...{ message: { contains: "AC" } } };
+          break;
+        case "sdcard":
+          conditions = { ...conditions, ...{ message: { contains: "SD" } } };
+          break;
+        case "report":
+          conditions = { ...conditions, ...{ message: { contains: "REPORT" } } };
+          break;
+        default:
+          throw new Error("Invalid filter");
+      }
+    } else {
+      const cache = await this.redis.get(key);
+      if (cache) return JSON.parse(cache);
+    }
     const notification = await this.prisma.notifications.findMany({ 
       where: conditions,
       include: { 
@@ -41,8 +68,7 @@ export class NotificationService {
       },
       orderBy: { createAt: 'desc' }
     });
-    if (notification.length === 0) return notification;
-    await this.redis.set(key, JSON.stringify(notification), 10);
+    if (notification.length > 0 && !filter) await this.redis.set(key, JSON.stringify(notification), 15);
     return notification;
   }
 
@@ -73,8 +99,28 @@ export class NotificationService {
   }
 
   async findCount(user: JwtPayloadDto) {
-    const notification = await this.findAll(user);
+    let notification: Notifications[] = [];
     let temp = 0,door = 0, internet = 0, plug = 0, sdcard = 0;
+    const { conditions, key } = this.findCondition(user);
+    const cache = await this.redis.get(`count-${key}`);
+    if (cache) {
+      notification = JSON.parse(cache);
+    } else {
+      notification = await this.prisma.notifications.findMany({ 
+        where: conditions,
+        include: { 
+          device: {
+            select: {
+              name: true,
+              ward: true,
+              hospital: true
+            }
+          } 
+        },
+        orderBy: { createAt: 'desc' }
+      });
+      if (notification.length > 0) await this.redis.set(`count-${key}`, JSON.stringify(notification), 30);
+    }
     if (notification.length === 0) return { temp, door, internet, plug, sdcard };
     notification.forEach(e => {
       const msgType = e.message.split("/");
@@ -121,6 +167,14 @@ export class NotificationService {
       case "USER":
         conditions = { device: { ward: user.wardId } };
         key = `notification:${user.wardId}`;
+        break;
+      case "LEGACY_USER":
+        conditions = { device: { ward: user.wardId } };
+        key = `notification:${user.wardId}`;
+        break;
+      case "LEGACY_ADMIN":
+        conditions = { device: { hospital: user.hosId } };
+        key = `notification:${user.hosId}`;
         break;
       case "ADMIN":
         conditions = { device: { hospital: user.hosId } };
