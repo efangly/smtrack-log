@@ -52,6 +52,8 @@ export class LogdayService {
       if (cache) return JSON.parse(cache);
     }
     const mobile = await this.prisma.devices.findMany({
+      take: perpage,
+      skip: (page - 1) * perpage,
       where: conditions,
       select: {
         serial: true,

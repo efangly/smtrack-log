@@ -56,6 +56,8 @@ export class NotificationService {
       if (cache) return JSON.parse(cache);
     }
     const notification = await this.prisma.notifications.findMany({ 
+      take: perpage,
+      skip: (page - 1) * perpage,
       where: conditions,
       include: { 
         device: {
