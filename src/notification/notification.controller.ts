@@ -29,6 +29,12 @@ export class NotificationController {
     return this.notificationService.findAll(filter, page, perpage, req.user);
   }
 
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Param('sn') sn: string) {
+    return this.notificationService.findOne(sn);
+  }
+
   @Get('history/filter')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER, Role.SERVICE, Role.ADMIN, Role.USER)

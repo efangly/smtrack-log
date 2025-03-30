@@ -74,6 +74,22 @@ export class NotificationService {
     return notification;
   }
 
+  async findOne(serial: string) {
+    const cache = await this.redis.get(`notification:${serial}`);
+    if (cache) return JSON.parse(cache);
+    const notification = await this.prisma.notifications.findMany({ 
+      where: { serial }, 
+      select: {
+        message: true,
+        detail: true,
+        createAt: true
+      },
+      orderBy: { createAt: 'desc' } 
+    });
+    if (notification.length > 0) await this.redis.set(`notification:${serial}`, JSON.stringify(notification), 10);
+    return notification;
+  }
+
   async findNotification(user: JwtPayloadDto, filter: string) {
     let query = `from(bucket: "${process.env.INFLUXDB_BUCKET}") `;
     if (filter) {

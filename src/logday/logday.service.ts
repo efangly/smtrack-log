@@ -4,9 +4,8 @@ import { UpdateLogdayDto } from './dto/update-logday.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { RabbitmqService } from '../rabbitmq/rabbitmq.service';
-import { DevicePayloadDto, JwtPayloadDto } from '../common/dto';
+import { DevicePayloadDto } from '../common/dto';
 import { format } from 'date-fns';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class LogdayService {
@@ -37,37 +36,6 @@ export class LogdayService {
       this.rabbitmq.sendToDevice<CreateLogdayDto>('log-device', createLogdayDto);
       return createLogdayDto;
     }
-  }
-
-  async findAll(filter: string, current: string, total: string, ward: string) {
-    if (!ward) throw new BadRequestException("Ward is required");
-    const page = parseInt(current) || 1;
-    const perpage = parseInt(total) || 10;
-    let conditions: Prisma.DevicesWhereInput | undefined = { ward };
-    let key = `mobile:${ward}${page}${perpage}`;
-    if (filter) {
-      conditions = { ...conditions, ...{ OR: [ { name: { contains: filter } }, { id: { contains: filter } } ] } };
-    } else {
-      const cache = await this.redis.get(key);
-      if (cache) return JSON.parse(cache);
-    }
-    const mobile = await this.prisma.devices.findMany({
-      take: perpage,
-      skip: (page - 1) * perpage,
-      where: conditions,
-      select: {
-        serial: true,
-        name: true,
-        ward: true,
-        hospital: true,
-        online: true,
-        log: { take: 1, orderBy: { createAt: 'desc' } },
-        notification: { orderBy: { createAt: 'desc' } }
-      },
-      orderBy: { seq: 'asc' }
-    });
-    if (mobile.length > 0 && !filter) await this.redis.set(key, JSON.stringify(mobile), 30);
-    return mobile;
   }
 
   async findOne(id: string) {

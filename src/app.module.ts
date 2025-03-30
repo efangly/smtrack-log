@@ -14,6 +14,7 @@ import { GraphModule } from './graph/graph.module';
 import { ConsumerModule } from './consumer/consumer.module';
 import { CronModule } from './cron/cron.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MobileModule } from './mobile/mobile.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     InfluxdbModule,
     GraphModule,
     ConsumerModule,
-    CronModule
+    CronModule,
+    MobileModule
   ],
   providers: [JwtStrategy, DeviceStrategy]
 })
