@@ -13,7 +13,7 @@ export class MobileController {
     return this.mobileService.findNotification(req.user);
   }
 
-  @Get(':id')
+  @Get(':ward')
   async findOne(@Param('ward') ward: string) {
     return this.mobileService.findWard(ward);
   }
