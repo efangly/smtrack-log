@@ -58,6 +58,8 @@ model Devices {
   seq          Int
   firmware     String
   remark       String?
+  position     String?
+  positionPic  String?
   online       Boolean         @default(false)
   log          LogDays[]
   notification Notifications[]

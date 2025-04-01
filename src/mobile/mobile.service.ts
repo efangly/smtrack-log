@@ -73,6 +73,8 @@ export class MobileService {
         ward: true,
         hospital: true,
         online: true,
+        position: true,
+        positionPic: true,
         log: { take: 1, orderBy: { createAt: 'desc' } },
         notification: { orderBy: { createAt: 'desc' } }
       },

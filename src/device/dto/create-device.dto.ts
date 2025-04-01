@@ -41,6 +41,16 @@ export class CreateDeviceDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(250)
+  position: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(250)
+  positionPic: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(255)
   remark: string;
   
