@@ -15,6 +15,16 @@ export class ConsumerService {
 
   async updateDevice(device: UpdateDeviceDto) {
     device.updateAt = dateFormat(new Date());
-    await this.device.update(device.serial, device);
+    await this.device.update(device.serial, {
+        ward: device.ward,
+        hospital: device.hospital,
+        staticName: device.staticName,
+        name: device.name,
+        status: device.status,
+        firmware: device.firmware || '1.0.0',
+        remark: device.remark,
+        positionPic: device.positionPic
+      }
+    );
   }
 }

@@ -29,7 +29,7 @@ export class NotificationController {
     return this.notificationService.findAll(filter, page, perpage, req.user);
   }
 
-  @Get()
+  @Get(':sn')
   @UseGuards(JwtAuthGuard)
   async findOne(@Param('sn') sn: string) {
     return this.notificationService.findOne(sn);
