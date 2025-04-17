@@ -215,34 +215,34 @@ export class NotificationService {
     switch (msgType[0]) {
       case "TEMP":
         if (msgType[1] === "OVER") {
-          detailMessage = "อุณหภูมิสูงเกินช่วงที่กำหนด";
+          detailMessage = "Temperature is too high";
         } else if (msgType[1] === "LOWER") {
-          detailMessage = "อุณหภูมิต่ำเกินช่วงที่กำหนด";
+          detailMessage = "Temperature is too low";
         } else {
-          detailMessage = "อุณหภูมิกลับสู่ช่วงที่กำหนด";
+          detailMessage = "Temperature returned to normal";
         }
         break;
       case "SD":
-        detailMessage = msgType[1] === "ON" ? "เมมโมรี่การ์ดเชื่อมต่อแล้ว" : "เมมโมรี่การ์ดไม่เชื่อมต่อ";
+        detailMessage = msgType[1] === "ON" ? "SDCard connected" : "SDCard failed";
         break;
       case "AC":
-        detailMessage = msgType[1] === "ON" ? "เชื่อมต่อปลั๊ก" : "ปลั๊กขาดการเชื่อมต่อ";
+        detailMessage = msgType[1] === "ON" ? "Power on" : "Power off";
         break;
       case "REPORT":
-        detailMessage = `รายงาน: ${msgType[1]}`;
+        detailMessage = `Report: ${msgType[1]}`;
         break;
       default:
         if (msgType[1] === "TEMP") {
-          detailMessage = `${msgType[0]}: อุณหภูมิอุณหภูมิ`;
+          detailMessage = `${msgType[0]}: Temperature `;
           if (msgType[2] === "OVER") {
-            detailMessage += "สูงเกินช่วงที่กำหนด";
+            detailMessage += "is too high";
           } else if (msgType[2] === "LOWER") {
-            detailMessage += "ต่ำเกินช่วงที่กำหนด";
+            detailMessage += "is too low";
           } else {
-            detailMessage += "กลับสู่ช่วงที่กำหนด";
+            detailMessage += "returned to normal";
           }
         } else {
-          detailMessage = `${msgType[0]}: ประตู${msgType[1].substring(4, 5)} ${msgType[2] === "ON" ? "เปิด" : "ปิด"}`;
+          detailMessage = `${msgType[0]}: ${msgType[1]} is ${msgType[2] === "ON" ? "opened" : "closed"}`;
         }
     }
     return detailMessage;
