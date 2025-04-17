@@ -25,7 +25,7 @@ jobs:
         sed -i "s|image: .*|image: ${{ env.IMAGE_NAME }}|" k8s/deploy.yaml
         git config user.name "FangLy"
         git config user.email "thefangsni@gmail.com"
-        git add deploy.yaml
+        git add k8s/deploy.yaml
         git commit -m "Update image to ${{ env.IMAGE_NAME }}"
         git push
     - name: Send success message to slack
