@@ -46,7 +46,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           break;
       }
     }
-    if (status !== 401) this.logger.error(`${status} Error: ${message}`);
+    if (status >= 500) this.logger.error(`${status} Error: ${message}`);
     response.status(status).json({
       message: message,
       success: false,
