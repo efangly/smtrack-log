@@ -12,14 +12,13 @@ import { HealthModule } from './health/health.module';
 import { InfluxdbModule } from './influxdb/influxdb.module';
 import { GraphModule } from './graph/graph.module';
 import { ConsumerModule } from './consumer/consumer.module';
-import { CronModule } from './cron/cron.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { MobileModule } from './mobile/mobile.module';
+import { BackupModule } from './backup/backup.module';
+
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    ScheduleModule.forRoot(),
     PassportModule,
     LogdayModule,
     RabbitmqModule,
@@ -31,8 +30,8 @@ import { MobileModule } from './mobile/mobile.module';
     InfluxdbModule,
     GraphModule,
     ConsumerModule,
-    CronModule,
-    MobileModule
+    MobileModule,
+    BackupModule
   ],
   providers: [JwtStrategy, DeviceStrategy]
 })
