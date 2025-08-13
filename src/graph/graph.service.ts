@@ -41,4 +41,17 @@ export class GraphService {
     if (result.length > 0) await this.redis.set(`graph:${sn}${filter.split(',').join("")}`, JSON.stringify(result), 1800);
     return result;
   }
+
+  async dailyReport(date: string) {
+    const query = `from(bucket: "${process.env.INFLUXDB_BUCKET}") 
+      |> range(start: -5m) 
+      |> filter(fn: (r) => r._measurement == "logdays") 
+      |> filter(fn: (r) => r._field == "temp" or r._field == "humidity" or r._field == "extMemory" or r._field == "door1" 
+      or r._field == "door2" or r._field == "door3" or r._field == "battery" or r._field == "plug" or r._field == "internet") 
+      |> filter(fn: (r) => r.probe == "1" or r.probe == "2") 
+      |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") 
+      |> keep(columns: ["_time", "temp", "humidity", "extMemory", "door1", "door2", "door3", "probe" , "battery", "plug", "internet"])`;
+    const result = await this.influxdb.queryData(query);
+    return result;
+  }
 }
