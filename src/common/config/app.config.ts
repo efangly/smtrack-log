@@ -35,7 +35,6 @@ export const APP_CONFIG = {
   VALIDATION_PIPE: {
     whitelist: true,
     transform: true,
-    forbidNonWhitelisted: true,
     transformOptions: {
       enableImplicitConversion: true,
     },
