@@ -24,38 +24,135 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+SMtrack Log Service - A NestJS-based microservice for handling IoT device logs and notifications with real-time monitoring capabilities.
 
-## Project setup
+## Features
+
+- **Real-time Data Processing**: Handles IoT device logs and sensor data
+- **Microservice Architecture**: RabbitMQ-based event-driven communication
+- **Multi-Database Support**: PostgreSQL (Prisma) + InfluxDB for time-series data
+- **Caching Layer**: Redis for performance optimization
+- **Authentication & Authorization**: JWT-based with role-based access control
+- **Health Monitoring**: Built-in health checks and metrics
+- **Data Backup & Cleanup**: Automated data management tools
+
+## Tech Stack
+
+- **Framework**: NestJS
+- **Database**: PostgreSQL with Prisma ORM
+- **Time-series DB**: InfluxDB
+- **Cache**: Redis
+- **Message Queue**: RabbitMQ
+- **Authentication**: JWT with Passport
+- **Validation**: class-validator & class-transformer
+
+## Project Setup
+
+### Prerequisites
+
+- Node.js 18+ 
+- PostgreSQL
+- Redis
+- RabbitMQ
+- InfluxDB (optional)
+
+### Installation
 
 ```bash
+# Install dependencies
 $ npm install
+
+# Copy environment variables
+$ cp .env.example .env
+
+# Configure your .env file with proper values
+
+# Generate Prisma client
+$ npm run db:generate
+
+# Run database migrations
+$ npm run db:migrate
 ```
 
-## Compile and run the project
+## Environment Configuration
+
+Create a `.env` file based on `.env.example` and configure:
+
+```env
+NODE_ENV=development
+PORT=8080
+DATABASE_URL="postgresql://username:password@localhost:5432/smtrack_log_db"
+RADIS_HOST=redis://localhost:6379
+RABBITMQ=amqp://localhost:5672
+JWT_SECRET=your-secret-key
+# ... other variables
+```
+
+## Development
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
+# Development mode with hot reload
 $ npm run start:dev
 
-# production mode
+# Debug mode
+$ npm run start:debug
+
+# Production mode
 $ npm run start:prod
 ```
 
-## Run tests
+## Database Operations
 
 ```bash
-# unit tests
+# Generate Prisma client
+$ npm run db:generate
+
+# Apply migrations
+$ npm run db:migrate
+
+# Deploy migrations (production)
+$ npm run db:migrate:prod
+
+# Open Prisma Studio
+$ npm run db:studio
+```
+
+## Testing
+
+```bash
+# Unit tests
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
+# Watch mode
+$ npm run test:watch
 
-# test coverage
+# Test coverage
 $ npm run test:cov
+
+# E2E tests
+$ npm run test:e2e
+```
+
+## Code Quality
+
+```bash
+# Lint check
+$ npm run lint:check
+
+# Lint and fix
+$ npm run lint
+
+# Format check
+$ npm run format:check
+
+# Format code
+$ npm run format
+
+# Type check
+$ npm run typecheck
+
+# Pre-commit checks
+$ npm run precommit
 ```
 
 ## Deployment
