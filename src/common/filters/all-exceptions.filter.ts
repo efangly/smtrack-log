@@ -57,7 +57,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (status >= 500) {
       this.logger.logError(`Internal Server Error: ${message}`, exception instanceof Error ? exception : new Error(message), 'AllExceptionsFilter', logContext);
-    } else if (status >= 400) {
+    } else if (status >= 400 && status !== 401) {
       this.logger.logWarning(`Client Error: ${message}`, 'AllExceptionsFilter', logContext);
     }
 
