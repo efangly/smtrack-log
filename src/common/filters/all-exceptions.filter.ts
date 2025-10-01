@@ -50,9 +50,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       path: request.url,
       method: request.method,
       statusCode: status,
-      errorCode,
-      userAgent: request.headers['user-agent'],
-      ip: request.ip,
+      errorCode
     };
 
     if (status >= 500) {
