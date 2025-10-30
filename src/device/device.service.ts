@@ -10,10 +10,10 @@ import { InfluxdbService } from '../influxdb/influxdb.service';
 @Injectable()
 export class DeviceService {
   constructor(
-    private readonly prisma: PrismaService, 
+    private readonly prisma: PrismaService,
     private readonly rabbitmq: RabbitmqService,
     private readonly influxdb: InfluxdbService
-  ) {}
+  ) { }
 
   async create(createDeviceDto: CreateDeviceDto) {
     return this.prisma.devices.create({
@@ -54,16 +54,24 @@ export class DeviceService {
   async findHistory(sn: string, type: string, user: string, filter: string) {
     if (!sn) throw new BadRequestException('Invalid sn');
     let query = `from(bucket: "${process.env.INFLUXDB_BUCKET}") `;
-    if (filter) {
-      query += `|> range(start: ${filter}T00:00:00Z, stop: ${filter}T23:59:59Z) `;
-    } else {
-      query += '|> range(start: -1d) ';
+    switch (filter) {
+      case '1d':
+        query += '|> range(start: -1d) ';
+        break;
+      case '7d':
+        query += '|> range(start: -7d) ';
+        break;
+      case '30d':
+        query += '|> range(start: -30d) ';
+        break;
+      default:
+        query += '|> range(start: -1d) ';
     }
     query += '|> timeShift(duration: 7h, columns: ["_time"]) ';
     query += '|> filter(fn: (r) => r._measurement == "history") ';
     query += `|> filter(fn: (r) => r.service == "${sn}") `;
-    if (type) `|> filter(fn: (r) => r.type == "${type}") `;
-    if (user) `|> filter(fn: (r) => r.user == "${user}") `;
+    if (type)`|> filter(fn: (r) => r.type == "${type}") `;
+    if (user)`|> filter(fn: (r) => r.user == "${user}") `;
     query += '|> filter(fn: (r) => r._field == "message") ';
     query += '|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value") ';
     query += '|> keep(columns: ["_time", "service", "type", "user", "message"])';

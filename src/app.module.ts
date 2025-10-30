@@ -14,14 +14,12 @@ import { GraphModule } from './graph/graph.module';
 import { ConsumerModule } from './consumer/consumer.module';
 import { MobileModule } from './mobile/mobile.module';
 import { BackupModule } from './backup/backup.module';
-import { LoggerModule } from './common/logger';
 
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     PassportModule,
-    LoggerModule,
     LogdayModule,
     RabbitmqModule,
     NotificationModule,

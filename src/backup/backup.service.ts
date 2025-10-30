@@ -1,4 +1,4 @@
-import { Injectable, Inject, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { DateUtils } from './utils/date.utils';
 import { JsonLogger } from '../common/logger/json.logger';
@@ -14,10 +14,8 @@ import {
 
 @Injectable()
 export class BackupService {
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(JsonLogger) private readonly logger: JsonLogger
-  ) {}
+  private readonly logger = new JsonLogger();
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Get count of logs and notifications before a specific date (default: today)

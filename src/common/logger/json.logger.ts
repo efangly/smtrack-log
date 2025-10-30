@@ -13,20 +13,14 @@ interface LogEntry {
 
 @Injectable()
 export class JsonLogger implements LoggerService {
-  private readonly serviceName = 'smtrack-log-service';
+  private readonly serviceName = 'device-service';
   private readonly environment = process.env.NODE_ENV || 'development';
-  private readonly enabledLevels: Set<string>;
-
-  constructor() {
-    // Configure to only output warn and error levels for Promtail consumption
-    this.enabledLevels = new Set(['warn', 'error']);
-  }
 
   /**
-   * Write a 'log' level log (disabled - only warn and error are output).
+   * Write a 'log' level log.
    */
   log(message: any, context?: string): void {
-    // Only warn and error levels are output for Promtail
+    // Don't log regular messages - only warn and error
     return;
   }
 
@@ -34,25 +28,21 @@ export class JsonLogger implements LoggerService {
    * Write an 'error' level log.
    */
   error(message: any, trace?: string, context?: string): void {
-    if (this.enabledLevels.has('error')) {
-      this.writeLog('error', message, context, trace);
-    }
+    this.writeLog('error', message, context, trace);
   }
 
   /**
    * Write a 'warn' level log.
    */
   warn(message: any, context?: string): void {
-    if (this.enabledLevels.has('warn')) {
-      this.writeLog('warn', message, context);
-    }
+    this.writeLog('warn', message, context);
   }
 
   /**
    * Write a 'debug' level log.
    */
   debug(message: any, context?: string): void {
-    // Debug logs are not enabled for stdout/Promtail
+    // Don't log debug messages - only warn and error
     return;
   }
 
@@ -60,7 +50,7 @@ export class JsonLogger implements LoggerService {
    * Write a 'verbose' level log.
    */
   verbose(message: any, context?: string): void {
-    // Verbose logs are not enabled for stdout/Promtail
+    // Don't log verbose messages - only warn and error
     return;
   }
 
@@ -72,7 +62,7 @@ export class JsonLogger implements LoggerService {
   }
 
   private writeLog(
-    level: 'warn' | 'error',
+    level: 'error' | 'warn',
     message: any,
     context?: string,
     trace?: string,
@@ -127,15 +117,13 @@ export class JsonLogger implements LoggerService {
     context?: string,
     metadata?: Record<string, any>
   ): void {
-    if (this.enabledLevels.has('error')) {
-      const trace = error?.stack;
-      const errorMessage = error ? `${message}: ${error.message}` : message;
-      
-      this.writeLog('error', errorMessage, context, trace, {
-        ...metadata,
-        errorName: error?.name,
-      });
-    }
+    const trace = error?.stack;
+    const errorMessage = error ? `${message}: ${error.message}` : message;
+    
+    this.writeLog('error', errorMessage, context, trace, {
+      ...metadata,
+      errorName: error?.name,
+    });
   }
 
   /**
@@ -146,10 +134,6 @@ export class JsonLogger implements LoggerService {
     context?: string,
     metadata?: Record<string, any>
   ): void {
-    if (this.enabledLevels.has('warn')) {
-      this.writeLog('warn', message, context, undefined, metadata);
-    }
+    this.writeLog('warn', message, context, undefined, metadata);
   }
-
-
 }

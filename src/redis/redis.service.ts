@@ -9,8 +9,7 @@ import { JsonLogger } from '../common/logger/json.logger';
 export class RedisService implements OnModuleInit, OnModuleDestroy {
   private client: RedisClientType;
   private isConnected = false;
-  
-  constructor(@Inject(JsonLogger) private readonly logger: JsonLogger) {}
+  private readonly logger = new JsonLogger();
   
   async set(key: string, value: string, expire: number = REDIS_CONSTANTS.CACHE.DEFAULT_TTL): Promise<boolean> {
     if (!this.isConnected) {

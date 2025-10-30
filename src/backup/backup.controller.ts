@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete, Query, Body, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Query, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { BackupService } from './backup.service';
 import {
   BackupCountResponse,

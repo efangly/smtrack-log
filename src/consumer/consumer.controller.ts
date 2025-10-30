@@ -8,10 +8,8 @@ import { JsonLogger } from '../common/logger/json.logger';
 
 @Controller()
 export class ConsumerController {
-  constructor(
-    private readonly consumerService: ConsumerService,
-    @Inject(JsonLogger) private readonly logger: JsonLogger
-  ) {}
+  private readonly logger = new JsonLogger();
+  constructor(private readonly consumerService: ConsumerService) {}
 
   @EventPattern(RABBITMQ_CONSTANTS.EVENTS.ADD_DEVICE)
   async addDevice(@Payload() data: CreateDeviceDto, @Ctx() context: RmqContext) {
