@@ -27,7 +27,7 @@ export class GraphService {
         if (!filter.includes(',')) throw new BadRequestException('Invalid filter');
         const date = filter.split(',');
         query += `|> range(start: ${date[0]}, stop: ${date[1]}) `;
-        query += '|> aggregateWindow(every: 30m, fn: first, createEmpty: false) ';
+        // query += '|> aggregateWindow(every: 30m, fn: first, createEmpty: false) ';
     };
     query += '|> timeShift(duration: 7h, columns: ["_time"]) ';
     query += '|> filter(fn: (r) => r._measurement == "logdays") ';
