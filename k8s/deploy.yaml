@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: log
-        image: siamatic/smtrack-log-service:1.1.8
+        image: siamatic/smtrack-log-service:1.1.8-a
         ports:
         - containerPort: 8080
         readinessProbe:
