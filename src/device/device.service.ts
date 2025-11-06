@@ -36,10 +36,10 @@ export class DeviceService {
   async onlineStatus(data: OnlineDto) {
     if (data.clientid.substring(0, 4) === "eTPV" || data.clientid.substring(0, 4) === "iTSV") {
       this.rabbitmq.sendToDevice('online', { sn: data.clientid, status: data.event === "client.connected" ? true : false });
-      await this.prisma.devices.update({
-        where: { serial: data.clientid },
-        data: { online: data.event === "client.connected" ? true : false }
-      });
+      // await this.prisma.devices.update({
+      //   where: { serial: data.clientid },
+      //   data: { online: data.event === "client.connected" ? true : false }
+      // });
     }
     return data;
   }
