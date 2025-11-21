@@ -15,7 +15,7 @@ export class NotificationService {
     private readonly redis: RedisService,
     private readonly rabbitmq: RabbitmqService,
     private readonly influxdb: InfluxdbService
-  ) {}
+  ) { }
   async create(createNotificationDto: CreateNotificationDto, user: DevicePayloadDto) {
     createNotificationDto.serial = user.sn;
     createNotificationDto.detail = this.setDetailMessage(createNotificationDto.message);
@@ -55,18 +55,18 @@ export class NotificationService {
       const cache = await this.redis.get(key);
       if (cache) return JSON.parse(cache);
     }
-    const notification = await this.prisma.notifications.findMany({ 
+    const notification = await this.prisma.notifications.findMany({
       take: perpage,
       skip: (page - 1) * perpage,
       where: conditions,
-      include: { 
+      include: {
         device: {
           select: {
             name: true,
             ward: true,
             hospital: true
           }
-        } 
+        }
       },
       orderBy: { createAt: 'desc' }
     });
@@ -77,14 +77,14 @@ export class NotificationService {
   async findOne(serial: string) {
     const cache = await this.redis.get(`notification:${serial}`);
     if (cache) return JSON.parse(cache);
-    const notification = await this.prisma.notifications.findMany({ 
-      where: { serial }, 
+    const notification = await this.prisma.notifications.findMany({
+      where: { serial },
       select: {
         message: true,
         detail: true,
         createAt: true
       },
-      orderBy: { createAt: 'desc' } 
+      orderBy: { createAt: 'desc' }
     });
     if (notification.length > 0) await this.redis.set(`notification:${serial}`, JSON.stringify(notification), 10);
     return notification;
@@ -108,7 +108,7 @@ export class NotificationService {
         break;
       case "USER":
         query += `|> filter(fn: (r) => r.ward == "${user.wardId}") `;
-        break; 
+        break;
     }
     query += '|> filter(fn: (r) => r._field == "message") ';
     query += '|> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")';
@@ -118,22 +118,22 @@ export class NotificationService {
 
   async findCount(user: JwtPayloadDto) {
     let notification: Notifications[] = [];
-    let temp = 0,door = 0, internet = 0, plug = 0, sdcard = 0;
+    let temp = 0, door = 0, internet = 0, plug = 0, sdcard = 0;
     const { conditions, key } = this.findCondition(user);
     const cache = await this.redis.get(`count-${key}`);
     if (cache) {
       notification = JSON.parse(cache);
     } else {
-      notification = await this.prisma.notifications.findMany({ 
+      notification = await this.prisma.notifications.findMany({
         where: conditions,
-        include: { 
+        include: {
           device: {
             select: {
               name: true,
               ward: true,
               hospital: true
             }
-          } 
+          }
         },
         orderBy: { createAt: 'desc' }
       });
@@ -232,17 +232,23 @@ export class NotificationService {
         detailMessage = `Report: ${msgType[1]}`;
         break;
       default:
-        if (msgType[1] === "TEMP") {
-          detailMessage = `${msgType[0]}: Temperature `;
-          if (msgType[2] === "OVER") {
-            detailMessage += "is too high";
-          } else if (msgType[2] === "LOWER") {
-            detailMessage += "is too low";
-          } else {
-            detailMessage += "returned to normal";
-          }
-        } else {
-          detailMessage = `${msgType[0]}: ${msgType[1]} is ${msgType[2] === "ON" ? "opened" : "closed"}`;
+        switch (msgType[1]) {
+          case 'TEMP':
+            detailMessage = `${msgType[0]}: Temperature `;
+            if (msgType[2] === "OVER") {
+              detailMessage += "is too high";
+            } else if (msgType[2] === "LOWER") {
+              detailMessage += "is too low";
+            } else {
+              detailMessage += "returned to normal";
+            }
+            break;
+          case 'SENSOR': 
+            detailMessage = `${msgType[0]}: ${msgType[2] === "ON" ? "Sensor disconnected" : "Sensor connected"}`;
+            break;
+          default:
+            detailMessage = `${msgType[0]}: ${msgType[1]} is ${msgType[2] === "ON" ? "opened" : "closed"}`;
+            break;
         }
     }
     return detailMessage;
