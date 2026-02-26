@@ -236,15 +236,22 @@ export class NotificationService {
           case 'TEMP':
             detailMessage = `${msgType[0]}: Temperature `;
             if (msgType[2] === "OVER") {
-              detailMessage += "is too high";
+              detailMessage += `is too high (${msgType[3]}°C)`;
             } else if (msgType[2] === "LOWER") {
-              detailMessage += "is too low";
+              detailMessage += `is too low (${msgType[3]}°C)`;
             } else {
               detailMessage += "returned to normal";
             }
             break;
           case 'SENSOR': 
             detailMessage = `${msgType[0]}: ${msgType[2] === "ON" ? "Sensor disconnected" : "Sensor connected"}`;
+            break;
+          case 'DOOR':
+            if (msgType[2] === "ON") {
+              detailMessage = `${msgType[0]}: The door has been open for more than ${msgType[3]} minutes.`;
+            } else {
+              detailMessage = `${msgType[0]}: The door has been closed`;
+            }
             break;
           default:
             detailMessage = `${msgType[0]}: ${msgType[1]} is ${msgType[2] === "ON" ? "opened" : "closed"}`;
