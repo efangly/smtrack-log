@@ -5,7 +5,7 @@ import { RedisService } from '../redis/redis.service';
 @Injectable()
 export class GraphService {
   constructor(private readonly influxdb: InfluxdbService, private readonly redis: RedisService) {}
-  async findAll(sn: string, filter: string) {
+  async findAll(sn: string, filter: string, freq: string) {
     if (!sn) throw new BadRequestException('Invalid sn');
     if (!filter) throw new BadRequestException('Invalid filter');
     const cache = await this.redis.get(`graph:${sn}${filter.split(',').join("")}`);
@@ -27,7 +27,7 @@ export class GraphService {
         if (!filter.includes(',')) throw new BadRequestException('Invalid filter');
         const date = filter.split(',');
         query += `|> range(start: ${date[0]}, stop: ${date[1]}) `;
-        // query += '|> aggregateWindow(every: 30m, fn: first, createEmpty: false) ';
+        if (freq) query += `|> aggregateWindow(every: ${freq}, fn: first, createEmpty: false) `;
     };
     query += '|> timeShift(duration: 7h, columns: ["_time"]) ';
     query += '|> filter(fn: (r) => r._measurement == "logdays") ';
